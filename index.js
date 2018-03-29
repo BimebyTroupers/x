@@ -36,6 +36,13 @@ const detectWin = () => {
   }
 };
 
+const detectErr = () => {
+  const { error } = game.getState();
+  if (error) {
+    process.stdout.write("Error: " + error); // <- why doesn't this work as separate arguments, "Unknown encoding" for `error`
+  }
+};
+
 // Create the store
 const game = createStore(gameReducer);
 
@@ -46,6 +53,7 @@ game.subscribe(printBoard);
 game.subscribe(getInput("X"));
 game.subscribe(getInput("O"));
 game.subscribe(detectWin);
+game.subscribe(detectErr);
 
 // We dispatch a dummy START action to call all our
 // subscribers the first time.
