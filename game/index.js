@@ -13,7 +13,7 @@ function streak(board, ...coords) {
   }
 }
 
-function winner(board) {
+function winner(board, turn) {
   const rows = [
     [[0, 0], [0, 1], [0, 2]],
     [[1, 0], [1, 1], [1, 2]],
@@ -26,7 +26,7 @@ function winner(board) {
   ];
 
   const checked = rows.map(row => streak(board, ...row));
-  if (state.turn > 9) {
+  if (turn > 9) {
     return "DRAW";
   } else if (checked.includes("X")) {
     return "X";
@@ -55,7 +55,7 @@ function turnReducer(state = { player: "X", turn: 1 }, action) {
   if (action.type === "MOVE") {
     return {
       player: action.player === "X" ? "O" : "X",
-      turn: action.turn + 1
+      turn: state.turn + 1
     };
   }
   return state;
@@ -71,13 +71,15 @@ function boardReducer(board = Map(), action) {
 }
 
 export default function reducer(state = {}, action) {
-  console.log("Reducer: ", action);
-  console.log("turnReducer", turnReducer(action.player, action));
-  const { turn, player } = turnReducer(action.player, action);
+  const nextBoard = boardReducer(state.board, action);
+  const { turn, player } = Object.getOwnPropertyNames(state).length
+    ? turnReducer(state, action) // Now I understand why each reducer
+    : turnReducer(undefined, action); // should only do one tiny thing
   return {
     turn,
     player,
-    // ...turnReducer(state.player, action),
-    board: boardReducer(state.board, action)
+    // ...turnReducer(state.player, action), // why does this break even with babel stage 2 enabled?
+    board: nextBoard,
+    winner: winner(nextBoard, turn)
   };
 }

@@ -28,6 +28,14 @@ const getInput = turn => async () => {
   game.dispatch(move(player, [row, col]));
 };
 
+const detectWin = () => {
+  const { winner } = game.getState();
+  if (winner) {
+    process.stdout.write("The winner is: " + winner); // <- why doesn't this work as separate arguments, "Unknown encoding" for `winner`
+    process.exit(0);
+  }
+};
+
 // Create the store
 const game = createStore(gameReducer);
 
@@ -37,6 +45,7 @@ game.subscribe(() => console.log("Subsribe: ", game.getState()));
 game.subscribe(printBoard);
 game.subscribe(getInput("X"));
 game.subscribe(getInput("O"));
+game.subscribe(detectWin);
 
 // We dispatch a dummy START action to call all our
 // subscribers the first time.
